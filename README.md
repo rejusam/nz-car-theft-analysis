@@ -39,6 +39,8 @@ Fleet denominators came from the NZTA Waka Kotahi Motor Vehicle Register — New
 
 At face value, the sources tell different stories. AMI and AA both rank the Aqua #1 for 2024. But the NZ Police database — covering 2021–22, before the Aqua's rise — ranks it only **#13**, behind the Toyota Hilux (#1), Ford Courier (#2), and Mazda Demio (#3). That shift from #13 to #1 in roughly two years is itself a signal worth investigating.
 
+Even within the same time period, the answer changes depending on which dataset you ask. In the MoneyHub/NZ Police data (H2 2025), the **Toyota Hilux leads all models with 184 thefts in six months** — more than the Aqua's 156. Yet AMI's headline names the Aqua #1. Why? Because AMI reports claims within its own policyholder portfolio, not total national thefts. The Hilux's 153,884-strong fleet includes large numbers of commercial and rural vehicles insured through fleet or specialist policies — not AMI's consumer book. The "most stolen car" answer depends not just on *how* you count, but *whose* data you count.
+
 ![Raw vs Adjusted Rankings](output/figures/01_raw_vs_adjusted_ranking.png)
 *When theft counts are adjusted for fleet size, the ranking changes dramatically. The Ford Courier rises 11 places; the Toyota Corolla drops 14.*
 
