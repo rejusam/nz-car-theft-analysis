@@ -1,0 +1,21 @@
+model,make,thefts_6mo,fleet_registered,annual_theft_rate_per_vehicle,risk_level,risk_rank_adjusted
+Ford Courier,Ford,46,5060,0.01818,EXTREME,1
+Mazda Bounty,Mazda,43,5112,0.01682,EXTREME,2
+Toyota Caldina,Toyota,32,7845,0.00816,HIGH,3
+Nissan Wingroad,Nissan,28,6230,0.00899,HIGH,4
+Subaru Legacy,Subaru,95,25418,0.00747,HIGH,5
+Toyota Wish,Toyota,52,15890,0.00654,HIGH,6
+Nissan Tiida,Nissan,135,42560,0.00634,HIGH,7
+Toyota Aqua,Toyota,156,52340,0.00596,HIGH,8
+Mazda Atenza,Mazda,68,22415,0.00607,HIGH,9
+Mazda Demio,Mazda,98,38920,0.00503,MODERATE,10
+Honda Fit,Honda,72,31540,0.00456,MODERATE,11
+Toyota Hilux,Toyota,184,153884,0.00239,LOW,12
+Toyota Corolla,Toyota,165,320450,0.00103,LOW,13
+Ford Ranger,Ford,62,103200,0.00120,LOW,14
+Mitsubishi Outlander,Mitsubishi,35,45670,0.00153,LOW,15
+Toyota RAV4,Toyota,28,68540,0.00082,LOW,16
+Suzuki Swift,Suzuki,55,89430,0.00123,LOW,17
+Nissan X-Trail,Nissan,22,34280,0.00128,LOW,18
+Honda CRV,Honda,18,42150,0.00085,LOW,19
+Mazda CX-5,Mazda,15,56780,0.00053,LOW,20

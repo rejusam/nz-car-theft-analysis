@@ -1,0 +1,101 @@
+region,model,make,thefts_6mo,thefts_annual_est,fleet_regional,theft_rate_per_1000
+Auckland,Ford Courier,Ford,8,16,759,21.080368906455863
+Auckland,Mazda Bounty,Mazda,6,12,920,13.043478260869565
+Auckland,Nissan Wingroad,Nissan,10,20,2118,9.442870632672332
+Auckland,Toyota Caldina,Toyota,9,18,1961,9.178990311065782
+Auckland,Subaru Legacy,Subaru,28,56,6609,8.473293993039794
+Auckland,Toyota Wish,Toyota,22,44,6038,7.28718118582312
+Auckland,Nissan Tiida,Nissan,52,104,14470,7.18728403593642
+Auckland,Mazda Atenza,Mazda,22,44,6725,6.5427509293680295
+Auckland,Toyota Aqua,Toyota,65,130,21982,5.913929578746247
+Auckland,Mazda Demio,Mazda,35,70,12454,5.620684117552593
+Auckland,Honda Fit,Honda,28,56,11354,4.932182490752158
+Auckland,Toyota Hilux,Toyota,42,84,43088,1.9494987003341997
+Auckland,Mitsubishi Outlander,Mitsubishi,12,24,13244,1.812141347025068
+Auckland,Nissan X-Trail,Nissan,7,14,9258,1.512205659969756
+Auckland,Suzuki Swift,Suzuki,20,40,29511,1.3554267900105046
+Auckland,Ford Ranger,Ford,14,28,25800,1.0852713178294573
+Auckland,Toyota Corolla,Toyota,53,106,99340,1.0670424803704448
+Auckland,Honda CRV,Honda,6,12,12645,0.9489916963226571
+Auckland,Toyota RAV4,Toyota,9,18,20562,0.8754012255617158
+Auckland,Mazda CX-5,Mazda,6,12,19873,0.6038343481105017
+Bay of Plenty,Ford Courier,Ford,4,8,405,19.753086419753085
+Bay of Plenty,Mazda Bounty,Mazda,4,8,409,19.559902200489
+Bay of Plenty,Toyota Caldina,Toyota,3,6,549,10.92896174863388
+Bay of Plenty,Nissan Wingroad,Nissan,2,4,436,9.174311926605505
+Bay of Plenty,Subaru Legacy,Subaru,8,16,1779,8.993816750983699
+Bay of Plenty,Toyota Wish,Toyota,4,8,1113,7.187780772686433
+Bay of Plenty,Nissan Tiida,Nissan,10,20,2979,6.71366230278617
+Bay of Plenty,Mazda Atenza,Mazda,5,10,1569,6.373486297004461
+Bay of Plenty,Mazda Demio,Mazda,8,16,2725,5.871559633027523
+Bay of Plenty,Toyota Aqua,Toyota,10,20,3664,5.458515283842795
+Bay of Plenty,Honda Fit,Honda,5,10,2208,4.528985507246377
+Bay of Plenty,Toyota Hilux,Toyota,16,32,10772,2.9706646862235426
+Bay of Plenty,Mitsubishi Outlander,Mitsubishi,3,6,3197,1.876759461995621
+Bay of Plenty,Nissan X-Trail,Nissan,2,4,2400,1.6666666666666667
+Bay of Plenty,Ford Ranger,Ford,6,12,7224,1.6611295681063123
+Bay of Plenty,Toyota Corolla,Toyota,15,30,22432,1.3373751783166905
+Bay of Plenty,Suzuki Swift,Suzuki,4,8,6260,1.2779552715654952
+Bay of Plenty,Toyota RAV4,Toyota,2,4,4798,0.8336807002917883
+Bay of Plenty,Honda CRV,Honda,1,2,2951,0.6777363605557438
+Bay of Plenty,Mazda CX-5,Mazda,1,2,3975,0.5031446540880503
+Canterbury,Ford Courier,Ford,14,28,860,32.55813953488372
+Canterbury,Mazda Bounty,Mazda,12,24,920,26.08695652173913
+Canterbury,Nissan Wingroad,Nissan,5,10,810,12.345679012345679
+Canterbury,Toyota Caldina,Toyota,6,12,1020,11.76470588235294
+Canterbury,Subaru Legacy,Subaru,18,36,3554,10.129431626336522
+Canterbury,Mazda Atenza,Mazda,13,26,2914,8.922443376801647
+Canterbury,Nissan Tiida,Nissan,22,44,5533,7.952286282306162
+Canterbury,Toyota Wish,Toyota,8,16,2066,7.744433688286544
+Canterbury,Toyota Aqua,Toyota,25,50,6801,7.351860020585208
+Canterbury,Mazda Demio,Mazda,16,32,5060,6.324110671936759
+Canterbury,Honda Fit,Honda,12,24,4100,5.853658536585366
+Canterbury,Toyota Hilux,Toyota,52,104,26160,3.9755351681957185
+Canterbury,Ford Ranger,Ford,17,34,16512,2.0591085271317833
+Canterbury,Mitsubishi Outlander,Mitsubishi,6,12,5937,2.02122283981809
+Canterbury,Nissan X-Trail,Nissan,4,8,4456,1.7953321364452424
+Canterbury,Suzuki Swift,Suzuki,9,18,11625,1.5483870967741935
+Canterbury,Toyota Corolla,Toyota,28,56,44863,1.2482446559525666
+Canterbury,Honda CRV,Honda,3,6,5480,1.094890510948905
+Canterbury,Toyota RAV4,Toyota,5,10,9596,1.0421008753647354
+Canterbury,Mazda CX-5,Mazda,2,4,7381,0.5419319875355644
+Waikato,Ford Courier,Ford,6,12,557,21.54398563734291
+Waikato,Mazda Bounty,Mazda,5,10,562,17.793594306049823
+Waikato,Toyota Caldina,Toyota,4,8,785,10.19108280254777
+Waikato,Nissan Wingroad,Nissan,3,6,623,9.630818619582664
+Waikato,Subaru Legacy,Subaru,12,24,2542,9.44138473642801
+Waikato,Nissan Tiida,Nissan,18,36,4256,8.458646616541353
+Waikato,Mazda Atenza,Mazda,9,18,2242,8.028545941123996
+Waikato,Toyota Wish,Toyota,6,12,1589,7.551919446192574
+Waikato,Toyota Aqua,Toyota,17,34,5234,6.495987772258311
+Waikato,Mazda Demio,Mazda,12,24,3892,6.166495375128468
+Waikato,Honda Fit,Honda,8,16,3154,5.072923272035511
+Waikato,Toyota Hilux,Toyota,24,48,18466,2.5993718184772012
+Waikato,Mitsubishi Outlander,Mitsubishi,4,8,4567,1.7516969564265383
+Waikato,Nissan X-Trail,Nissan,3,6,3428,1.750291715285881
+Waikato,Suzuki Swift,Suzuki,7,14,8943,1.565470200156547
+Waikato,Ford Ranger,Ford,8,16,12384,1.2919896640826873
+Waikato,Toyota Corolla,Toyota,20,40,32045,1.2482446559525666
+Waikato,Honda CRV,Honda,2,4,4215,0.9489916963226571
+Waikato,Toyota RAV4,Toyota,3,6,6854,0.8754012255617158
+Waikato,Mazda CX-5,Mazda,2,4,5678,0.7044734061289186
+Wellington,Ford Courier,Ford,3,6,455,13.186813186813186
+Wellington,Mazda Bounty,Mazda,3,6,460,13.043478260869565
+Wellington,Nissan Wingroad,Nissan,3,6,685,8.75912408759124
+Wellington,Subaru Legacy,Subaru,10,20,2796,7.15307582260372
+Wellington,Toyota Caldina,Toyota,3,6,863,6.952491309385863
+Wellington,Toyota Wish,Toyota,5,10,1748,5.720823798627002
+Wellington,Mazda Atenza,Mazda,7,14,2466,5.6772100567721
+Wellington,Nissan Tiida,Nissan,13,26,4682,5.553182400683468
+Wellington,Toyota Aqua,Toyota,15,30,5757,5.211047420531527
+Wellington,Mazda Demio,Mazda,11,22,4281,5.138986218173324
+Wellington,Honda Fit,Honda,7,14,3469,4.03574517151917
+Wellington,Toyota Hilux,Toyota,12,24,13850,1.7328519855595668
+Wellington,Mitsubishi Outlander,Mitsubishi,4,8,5024,1.5923566878980893
+Wellington,Suzuki Swift,Suzuki,6,12,9837,1.219884111009454
+Wellington,Nissan X-Trail,Nissan,2,4,3771,1.0607265977194378
+Wellington,Toyota Corolla,Toyota,18,36,35250,1.0212765957446808
+Wellington,Ford Ranger,Ford,5,10,10320,0.9689922480620154
+Wellington,Honda CRV,Honda,2,4,4637,0.8626266982963123
+Wellington,Toyota RAV4,Toyota,3,6,7539,0.7958615200955034
+Wellington,Mazda CX-5,Mazda,2,4,6246,0.6404098623118796

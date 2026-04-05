@@ -1,0 +1,33 @@
+model,rank_ami,rank_aa,rank_police,thefts_police,rank_moneyhub,sources_ranked,avg_rank
+Toyota Hilux,6.0,,1,132,1.0,3,2.7
+Mazda Demio,4.0,2.0,3,94,5.0,4,3.5
+Nissan Tiida,3.0,3.0,7,72,4.0,4,4.2
+Toyota Aqua,1.0,1.0,13,52,3.0,4,4.5
+Toyota Corolla,2.0,4.0,16,46,2.0,4,6.0
+Mazda Atenza,5.0,7.0,5,79,8.0,4,6.2
+Subaru Legacy,,10.0,4,88,6.0,3,6.7
+Ford Courier,,,2,132,12.0,2,7.0
+Subaru Impreza,8.0,8.0,6,74,,3,7.3
+Toyota Mark X,9.0,6.0,9,59,,3,8.0
+Nissan Navara,,,10,57,,1,10.0
+Mazda Bounty,,,11,55,13.0,2,12.0
+Holden Commodore,,,12,54,,1,12.0
+Suzuki Swift,,,17,44,10.0,2,13.5
+Honda Accord,,,14,47,,1,14.0
+Toyota Vitz,7.0,5.0,32,24,,3,14.7
+Ford Falcon,,,15,47,,1,15.0
+Mazda Axela,10.0,,20,38,,2,15.0
+Subaru Forester,,9.0,26,30,,2,17.5
+Mazda Familia,,,18,44,,1,18.0
+Volkswagen Golf,,,19,40,,1,19.0
+Mitsubishi Outlander,,,25,32,14.0,2,19.5
+Ford Ranger,,,33,24,9.0,2,21.0
+Mitsubishi Lancer,,,21,37,,1,21.0
+Honda Fit,,,35,21,7.0,2,21.0
+Toyota RAV4,,,36,20,16.0,2,26.0
+Toyota Caldina,,,40,19,15.0,2,27.5
+Honda CRV,,,47,14,19.0,2,33.0
+Toyota Wish,,,70,9,11.0,2,40.5
+Nissan X-Trail,,,69,10,18.0,2,43.5
+Nissan Wingroad,,,71,9,16.0,2,43.5
+Mazda CX-5,,,203,2,20.0,2,111.5

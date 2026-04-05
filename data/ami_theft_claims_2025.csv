@@ -1,0 +1,11 @@
+model,make,theft_claims_pct,theft_per_1000_insured,rank_raw,rank_since_2024
+Toyota Aqua,Toyota,8.0,54.0,1,0
+Toyota Corolla,Toyota,7.0,15.0,2,0
+Nissan Tiida,Nissan,6.0,,3,0
+Toyota Vitz,Toyota,,,,2
+Mazda Demio,Mazda,,,5,0
+Subaru Legacy,Subaru,,,6,0
+Toyota Hilux,Toyota,,,7,0
+Mazda Atenza,Mazda,,,8,0
+Toyota Wish,Toyota,,,9,0
+Honda Fit,Honda,,,10,0

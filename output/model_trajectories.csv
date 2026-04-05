@@ -1,0 +1,12 @@
+model,first_year,last_year,years_in_top_10,first_rank,last_rank,rank_change,rank_trend_slope,trajectory
+Toyota Aqua,2022,2025,4,1,1,0,0.0,Stable
+Toyota Corolla,2022,2025,4,8,2,-6,-1.9,Rising
+Nissan Tiida,2022,2025,4,3,3,0,0.1,Stable
+Mazda Demio,2022,2025,4,2,4,2,0.6,Falling
+Toyota Vitz,2022,2025,4,6,5,-1,-0.3,Stable
+Toyota Hilux,2023,2025,3,10,6,-4,-2.0,Rising
+Subaru Impreza,2022,2025,4,9,7,-2,-0.6,Rising
+Mazda Atenza,2022,2025,4,4,8,4,1.2,Falling
+Toyota Mark X,2022,2025,4,5,9,4,1.5,Falling
+Subaru Legacy,2022,2023,2,7,9,2,2.0,Falling
+Mazda Axela,2024,2025,2,10,10,0,0.0,Stable

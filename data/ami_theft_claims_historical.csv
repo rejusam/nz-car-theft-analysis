@@ -1,0 +1,41 @@
+year,model,make,rank,theft_claims_pct,total_claims_national,est_model_claims,theft_per_1000_insured,regional_leader
+2022,Toyota Aqua,Toyota,1,11.0,8492,934,,Auckland
+2022,Mazda Demio,Mazda,2,7.0,8492,594,,Auckland
+2022,Nissan Tiida,Nissan,3,6.0,8492,510,,Waikato
+2022,Mazda Atenza,Mazda,4,4.0,8492,340,,Auckland
+2022,Toyota Mark X,Toyota,5,3.5,8492,297,,Auckland
+2022,Toyota Vitz,Toyota,6,3.0,8492,255,,Auckland
+2022,Subaru Legacy,Subaru,7,3.0,8492,255,,Canterbury
+2022,Toyota Corolla,Toyota,8,2.5,8492,212,,Wellington
+2022,Subaru Impreza,Subaru,9,2.0,8492,170,,Canterbury
+2022,Mazda Familia,Mazda,10,2.0,8492,170,,Auckland
+2023,Toyota Aqua,Toyota,1,8.0,17000,1360,,Auckland
+2023,Nissan Tiida,Nissan,2,6.0,17000,1020,,Waikato
+2023,Toyota Corolla,Toyota,3,5.0,17000,850,,Wellington
+2023,Mazda Demio,Mazda,4,5.0,17000,850,,Auckland
+2023,Mazda Atenza,Mazda,5,4.0,17000,680,,Auckland
+2023,Toyota Mark X,Toyota,6,3.0,17000,510,,Auckland
+2023,Toyota Vitz,Toyota,7,3.0,17000,510,,Auckland
+2023,Subaru Impreza,Subaru,8,2.5,17000,425,,Canterbury
+2023,Subaru Legacy,Subaru,9,2.0,17000,340,,Canterbury
+2023,Toyota Hilux,Toyota,10,2.0,17000,340,,Canterbury
+2024,Toyota Aqua,Toyota,1,8.0,12000,960,,Auckland
+2024,Toyota Corolla,Toyota,2,6.0,12000,720,,Waikato
+2024,Nissan Tiida,Nissan,3,5.0,12000,600,,Waikato
+2024,Mazda Demio,Mazda,4,4.0,12000,480,,Auckland
+2024,Mazda Atenza,Mazda,5,3.5,12000,420,,Auckland
+2024,Toyota Hilux,Toyota,6,3.0,12000,360,,Canterbury
+2024,Toyota Vitz,Toyota,7,2.5,12000,300,,Auckland
+2024,Subaru Impreza,Subaru,8,2.0,12000,240,,Canterbury
+2024,Toyota Mark X,Toyota,9,2.0,12000,240,,Auckland
+2024,Mazda Axela,Mazda,10,1.5,12000,180,,Auckland
+2025,Toyota Aqua,Toyota,1,8.0,9000,720,54.0,Auckland
+2025,Toyota Corolla,Toyota,2,7.0,9000,630,15.0,Waikato
+2025,Nissan Tiida,Nissan,3,6.0,9000,540,,Auckland
+2025,Mazda Demio,Mazda,4,4.0,9000,360,,Auckland
+2025,Toyota Vitz,Toyota,5,3.5,9000,315,,Auckland
+2025,Toyota Hilux,Toyota,6,3.0,9000,270,,Canterbury
+2025,Subaru Impreza,Subaru,7,2.5,9000,225,,Canterbury
+2025,Mazda Atenza,Mazda,8,2.5,9000,225,,Auckland
+2025,Toyota Mark X,Toyota,9,2.0,9000,180,,Auckland
+2025,Mazda Axela,Mazda,10,1.5,9000,135,,Auckland

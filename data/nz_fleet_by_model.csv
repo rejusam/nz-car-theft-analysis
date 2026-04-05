@@ -1,0 +1,21 @@
+model,make,fleet_registered,median_vehicle_age_years,pct_over_10_years,primary_fuel,has_encrypted_immobiliser,pct_fleet_in_auckland
+Toyota Corolla,Toyota,320450,16,78,Petrol,Mixed,31
+Toyota Hilux,Toyota,153884,12,55,Diesel,Mixed,28
+Ford Ranger,Ford,103200,10,42,Diesel,Yes,25
+Suzuki Swift,Suzuki,89430,13,65,Petrol,Mixed,33
+Toyota RAV4,Toyota,68540,11,48,Petrol/Hybrid,Yes,30
+Mazda CX-5,Mazda,56780,8,28,Petrol,Yes,35
+Toyota Aqua,Toyota,52340,10,45,Hybrid,No,42
+Mitsubishi Outlander,Mitsubishi,45670,11,52,Petrol,Mixed,29
+Nissan Tiida,Nissan,42560,17,92,Petrol,No,34
+Honda CRV,Honda,42150,12,58,Petrol,Mixed,30
+Mazda Demio,Mazda,38920,15,80,Petrol,No,32
+Nissan X-Trail,Nissan,34280,13,62,Petrol/Diesel,Mixed,27
+Honda Fit,Honda,31540,14,72,Petrol/Hybrid,No,36
+Subaru Legacy,Subaru,25418,18,88,Petrol,No,26
+Mazda Atenza,Mazda,22415,16,85,Petrol,No,30
+Toyota Wish,Toyota,15890,15,90,Petrol,No,38
+Toyota Caldina,Toyota,7845,20,98,Petrol,No,25
+Mazda Bounty,Mazda,5112,24,100,Petrol,No,18
+Ford Courier,Ford,5060,26,100,Petrol/Diesel,No,15
+Toyota Vitz,Toyota,48320,14,75,Petrol,No,35
