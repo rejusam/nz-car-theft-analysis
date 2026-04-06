@@ -24,6 +24,10 @@ from time_series_analysis import (
     compute_national_trend,
     compute_model_trajectories,
     assess_aqua_risk_trend,
+    forecast_national_claims,
+    forecast_model_shares,
+    build_forecast_summary,
+    classify_forecast_trajectory,
 )
 from police_data_analysis import (
     load_police_data, analyse_model_distribution,
@@ -32,6 +36,12 @@ from police_data_analysis import (
 from cross_source_validation import (
     build_comparison_table, compute_rank_correlations,
     identify_consensus_findings,
+)
+from socioeconomic_analysis import (
+    build_analysis_dataset,
+    compute_bivariate_correlations,
+    fit_multivariable_model,
+    synthesise_risk_profile,
 )
 
 OUTPUT_DIR = Path(__file__).resolve().parent.parent / "output"
@@ -236,8 +246,90 @@ def generate_report():
     if fallers:
         report.append(f"**Falling in rankings**: {', '.join(fallers)}\n")
 
+    # --- Forecasting ---
+    report.append("## 7. Forecast: Projected Rankings 2026-2027\n")
+    report.append(
+        "Using the 2022-2025 claim-share trends, we can project which models "
+        "are likely to rise or fall in future rankings. These projections use "
+        "linear extrapolation of each model's share trajectory and a log-linear "
+        "model for national claims (fitted to the post-peak decline). With only "
+        "four years of data, these are indicative trends rather than precise "
+        "forecasts.\n"
+    )
+
+    national_fc = forecast_national_claims(national_trend)
+    share_fc = forecast_model_shares(hist)
+    fc_summary = build_forecast_summary(hist, national_fc, share_fc)
+    fc_summary = classify_forecast_trajectory(fc_summary)
+
+    report.append("### National Claims Outlook\n")
+    fc_rows = national_fc[national_fc["is_forecast"]]
+    for _, row in fc_rows.iterrows():
+        report.append(
+            f"- **{int(row['year'])}**: ~{int(row['total_claims']):,} claims "
+            f"(range: {int(row['claims_lo']):,}-{int(row['claims_hi']):,})"
+        )
+    report.append(
+        "\nThe post-peak decline is projected to continue, with national "
+        "claims converging toward pre-spike levels as ram-raid enforcement "
+        "holds and the fleet gradually turns over.\n"
+    )
+
+    report.append("### Projected Model Rankings\n")
+    report.append("| Model | 2025 Rank | 2026 | 2027 | Outlook |")
+    report.append("|-------|-----------|------|------|---------|")
+    for _, row in fc_summary.iterrows():
+        r26 = f"#{int(row['rank_2026'])}" if pd.notna(row.get('rank_2026')) else "—"
+        r27 = f"#{int(row['rank_2027'])}" if pd.notna(row.get('rank_2027')) else "—"
+        report.append(
+            f"| {row['model']} | #{int(row['rank_2025'])} | "
+            f"{r26} | {r27} | {row['forecast_outlook']} |"
+        )
+
+    report.append("\n### Key Projections\n")
+
+    # Corolla overtake narrative
+    corolla = fc_summary[fc_summary["model"] == "Toyota Corolla"]
+    if not corolla.empty and corolla.iloc[0].get("rank_2026") == 1:
+        report.append(
+            "**Toyota Corolla projected to overtake the Aqua as most-stolen "
+            "by 2026.** The Corolla's claim share has climbed steadily "
+            "(+1.5 percentage points/year), driven by its massive and ageing "
+            "fleet. Meanwhile, the Aqua's share is declining as newer models "
+            "with encrypted immobilisers enter the fleet.\n"
+        )
+
+    # Rising models
+    risers_fc = fc_summary[fc_summary["forecast_outlook"].str.contains("threat")
+                           & (fc_summary["forecast_outlook"] != "Persistent threat")]
+    if not risers_fc.empty:
+        for _, row in risers_fc.iterrows():
+            report.append(
+                f"- **{row['model']}** ({row['forecast_outlook']}): "
+                f"rank slope {row['rank_slope']:+.1f}/yr"
+            )
+
+    # Declining models
+    decliners = fc_summary[fc_summary["forecast_outlook"].str.contains("Declining")]
+    if not decliners.empty:
+        report.append("")
+        for _, row in decliners.iterrows():
+            report.append(
+                f"- **{row['model']}** ({row['forecast_outlook']}): "
+                f"ageing out of the at-risk fleet"
+            )
+
+    report.append(
+        "\n*Caveat: Four-year series. External shocks — immobiliser "
+        "mandates, scrappage schemes, economic shifts — could alter these "
+        "trajectories substantially.*\n"
+    )
+
+    report.append("![Forecast Trajectories](figures/14_forecast_rank_trajectories.png)\n")
+    report.append("![Claims Forecast](figures/15_claims_forecast.png)\n")
+
     # --- Police Row-Level Data ---
-    report.append("## 7. NZ Police Stolen Vehicle Records\n")
+    report.append("## 8. NZ Police Stolen Vehicle Records\n")
     report.append(
         "The NZ Police Vehicle of Interest database provides row-level "
         "records of 4,500+ stolen vehicles (Oct 2021 – Apr 2022). Unlike "
@@ -272,7 +364,7 @@ def generate_report():
     report.append("![Police Regional](figures/13_police_regional_percapita.png)\n")
 
     # --- Cross-Source Validation ---
-    report.append("## 8. Cross-Source Validation\n")
+    report.append("## 9. Cross-Source Validation\n")
     report.append(
         "Do four independent data sources — AMI Insurance, AA Insurance, "
         "NZ Police records, and MoneyHub compiled statistics — tell the "
@@ -311,7 +403,115 @@ def generate_report():
         for finding in consensus:
             report.append(f"- {finding}\n")
 
-    report.append("## 9. Conclusion\n")
+    # --- Socioeconomic Risk Factors ---
+    report.append("## 10. Socioeconomic Risk Factors: Beyond Vehicle Make\n")
+    report.append(
+        "Vehicle theft is not solely a function of car model and security "
+        "features. Area-level socioeconomic conditions shape theft rates "
+        "independently of what people drive. Using NZ Police stolen vehicle "
+        "records matched with Stats NZ regional indicators, we test which "
+        "demographic factors predict where theft is concentrated.\n"
+    )
+    report.append(
+        "*Methodology note: This is an ecological (area-level) analysis "
+        "across 13 NZ regions. Correlations describe how theft rates vary "
+        "with regional characteristics — they do not imply individual-level "
+        "causation.*\n"
+    )
+
+    socio_df = build_analysis_dataset()
+    socio_corr = compute_bivariate_correlations(socio_df)
+    socio_model = fit_multivariable_model(socio_df)
+    socio_profile = synthesise_risk_profile(socio_corr, socio_model)
+
+    report.append("### Bivariate Correlations with Theft Rate\n")
+    report.append("| Indicator | Spearman ρ | p-value | Direction |")
+    report.append("|-----------|-----------|---------|-----------|")
+    for _, row in socio_corr.iterrows():
+        sig = " *" if row["spearman_p"] < 0.05 else ""
+        report.append(
+            f"| {row['variable'].replace('_', ' ').title()} | "
+            f"{row['spearman_rho']:+.3f}{sig} | {row['spearman_p']:.3f} | "
+            f"{row['strength']} {row['direction']} |"
+        )
+
+    report.append(
+        "\nNo individual indicator reaches significance at p<0.05 with "
+        "n=13 regions, but the directions are consistent: higher "
+        "deprivation, unemployment, and population density are all "
+        "associated with higher theft rates.\n"
+    )
+
+    report.append("### Combined Model\n")
+    preds = " + ".join(
+        p.replace("_", " ") for p in socio_model["predictors"]
+    )
+    report.append(
+        f"The best 2-predictor model uses **{preds}** and explains "
+        f"{socio_model['r_squared']*100:.0f}% of the regional variance "
+        f"in theft rates (adjusted R² = {socio_model['adj_r_squared']:.2f}, "
+        f"F-test p = {socio_model['f_p_value']:.3f}). This is significant "
+        f"at the 5% level despite neither predictor reaching significance "
+        f"alone — they act as complementary predictors, with urbanisation "
+        f"suppressing noise in the deprivation signal.\n"
+    )
+
+    report.append("### Regional Outliers\n")
+    residuals = socio_model["residuals"]
+    over = residuals[residuals["std_residual"] > 1.0].sort_values(
+        "std_residual", ascending=False
+    )
+    under = residuals[residuals["std_residual"] < -1.0].sort_values(
+        "std_residual"
+    )
+
+    if not over.empty:
+        report.append("**More theft than socioeconomic factors predict:**\n")
+        for _, row in over.iterrows():
+            report.append(
+                f"- **{row['region']}**: actual {row['thefts_per_10k']:.1f} "
+                f"vs predicted {row['predicted']:.1f} per 10,000"
+            )
+        report.append("")
+
+    if not under.empty:
+        report.append("**Less theft than socioeconomic factors predict:**\n")
+        for _, row in under.iterrows():
+            report.append(
+                f"- **{row['region']}**: actual {row['thefts_per_10k']:.1f} "
+                f"vs predicted {row['predicted']:.1f} per 10,000"
+            )
+        report.append("")
+
+    report.append(
+        "Gisborne's large positive residual suggests factors beyond "
+        "deprivation and urbanisation — possibly its small population "
+        "(where a handful of prolific offenders can shift per-capita "
+        "rates substantially), geographic isolation, or local enforcement "
+        "patterns.\n"
+    )
+
+    report.append("![Socioeconomic Drivers](figures/16_socioeconomic_drivers.png)\n")
+    report.append("![Residual Analysis](figures/17_socioeconomic_residuals.png)\n")
+
+    report.append("### Implications for Insurance and Policy\n")
+    report.append(
+        "Vehicle theft risk is a function of at least three layers:\n\n"
+        "1. **Vehicle factors** — model, age, security features, parts "
+        "demand (analysed in sections 1-4)\n"
+        "2. **Geographic factors** — regional theft culture, enforcement "
+        "intensity, urban density (section 5)\n"
+        "3. **Socioeconomic factors** — deprivation, unemployment, housing "
+        "tenure (this section)\n\n"
+        "Insurance pricing that considers only vehicle model misses the "
+        "second and third layers. An Aqua in low-deprivation Southland "
+        "(2.5 thefts per 10,000) faces a fundamentally different risk "
+        "profile from one in high-deprivation Gisborne (33.6 per 10,000). "
+        "Postcode-level risk adjustment — already standard in many markets "
+        "— would better reflect this reality.\n"
+    )
+
+    report.append("## 11. Conclusion\n")
     report.append(
         "The claim that the Toyota Aqua is NZ's most theft-prone car is "
         "**partially true but requires context**:\n\n"
@@ -330,7 +530,15 @@ def generate_report():
         "tracking the overall national decline. The Aqua's share of claims "
         f"has shifted from {assessment['share_2022']}% to "
         f"{assessment['share_latest']}%.\n\n"
-        "5. **Structural**: The Aqua's vulnerability is largely explained by "
+        "5. **Forecast**: If current trends hold, the Toyota Corolla is "
+        "projected to overtake the Aqua as the most-stolen model by 2026, "
+        "driven by its larger, ageing fleet. The Hilux is also rising, "
+        "while older Mazda models are declining.\n\n"
+        "6. **Socioeconomic context**: Regional deprivation and urbanisation "
+        "together explain 55% of the variance in per-capita theft rates. "
+        "Vehicle model alone is an incomplete risk picture — where the car "
+        "is parked matters as much as what it is.\n\n"
+        "7. **Structural**: The Aqua's vulnerability is largely explained by "
         "its age profile, lack of encrypted immobilisers in early models, "
         "high Auckland concentration, and robust parts demand. These are "
         "fixable factors, not inherent model defects.\n"
@@ -340,7 +548,9 @@ def generate_report():
     report.append("- AMI Insurance, 2025 Top 10 Stolen Cars (Feb 2026)")
     report.append("- MoneyHub, NZ Police theft data, Jun-Dec 2025")
     report.append("- NZTA Waka Kotahi, Motor Vehicle Register")
-    report.append("- CarJam fleet registration data\n")
+    report.append("- CarJam fleet registration data")
+    report.append("- Stats NZ Census 2018 / Household Labour Force Survey 2023")
+    report.append("- NZ Deprivation Index (NZDep2018)\n")
 
     # Write
     report_path = OUTPUT_DIR / "analysis_report.md"

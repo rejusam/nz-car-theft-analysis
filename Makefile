@@ -4,7 +4,7 @@ PYTHON = python3
 SRC = src
 OUT = output
 
-all: setup base stats confounds regional timeseries police crossval plots report
+all: setup base stats confounds regional timeseries police crossval socioeconomic plots report
 
 setup:
 	pip install -r requirements.txt --break-system-packages -q
@@ -29,6 +29,9 @@ police:
 
 crossval:
 	cd $(SRC) && $(PYTHON) cross_source_validation.py
+
+socioeconomic:
+	cd $(SRC) && $(PYTHON) socioeconomic_analysis.py
 
 plots:
 	cd $(SRC) && $(PYTHON) visualisation.py

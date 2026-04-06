@@ -1,0 +1,12 @@
+model,trajectory_2022_2025,rank_2025,rank_slope,share_2026,claims_2026,rank_2026,confidence,share_2027,claims_2027,rank_2027,forecast_outlook
+Toyota Aqua,Stable,1,0.0,6.5,421,2,moderate,5.6,280,2,Persistent threat
+Toyota Corolla,Rising,2,-1.9,8.8,571,1,moderate,10.2,510,1,Accelerating threat
+Nissan Tiida,Stable,3,0.1,5.5,357,3,low,5.4,270,3,Persistent threat
+Mazda Demio,Falling,4,0.6,2.5,162,6,moderate,1.5,75,9,Declining gradually
+Toyota Vitz,Stable,5,-0.3,3.2,207,5,low,3.3,165,5,Persistent threat
+Toyota Hilux,Rising,6,-2.0,3.7,240,4,moderate,4.2,210,4,Accelerating threat
+Subaru Impreza,Rising,7,-0.6,2.5,162,6,low,2.6,130,6,Emerging threat
+Mazda Atenza,Falling,8,1.2,2.2,143,8,moderate,1.8,90,8,Declining rapidly
+Toyota Mark X,Falling,9,1.5,1.2,78,11,moderate,0.7,35,11,Declining rapidly
+Subaru Legacy,Falling,9,2.0,0.5,32,12,low,0.5,25,12,Declining rapidly
+Mazda Axela,Stable,10,0.0,1.5,97,10,low,1.5,75,9,Persistent threat

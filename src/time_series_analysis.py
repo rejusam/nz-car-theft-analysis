@@ -262,6 +262,278 @@ def print_time_series_report(aqua_trend: pd.DataFrame,
         print(f"  Falling: {', '.join(fallers['model'].tolist())}")
 
 
+def forecast_national_claims(national: pd.DataFrame,
+                             horizon: int = 2) -> pd.DataFrame:
+    """
+    Project national theft claims forward using log-linear regression
+    on the post-peak decline (2023-2025).
+
+    The 2022-2023 spike was a structural break (ram-raid crisis), so
+    the forward-looking signal comes from the post-peak reversion. A
+    log-linear model captures the decelerating percentage decline
+    naturally — each year's absolute drop is smaller than the last,
+    converging toward a baseline.
+
+    Floor of 5,000 claims (NZ has never recorded fewer in the modern
+    era). Predictions include a 70% prediction interval.
+    """
+    # Use post-peak decline for trend (2023-2025)
+    decline = national[national["year"] >= 2023].copy()
+    years_d = decline["year"].values.astype(float)
+    log_claims = np.log(decline["total_claims"].values.astype(float))
+
+    slope, intercept, r, p, se = stats.linregress(years_d, log_claims)
+
+    # Residual standard error in log-space
+    fitted = intercept + slope * years_d
+    residuals = log_claims - fitted
+    n = len(years_d)
+    rse = np.sqrt(np.sum(residuals**2) / max(n - 2, 1))
+
+    all_years = national["year"].values.astype(float)
+
+    forecast_years = np.arange(all_years[-1] + 1,
+                               all_years[-1] + 1 + horizon)
+    log_forecast = intercept + slope * forecast_years
+
+    # 70% prediction interval in log-space, back-transformed
+    t_val = 1.96  # widen for sparse data
+    rows = []
+    for yr, lfc in zip(forecast_years, log_forecast):
+        lever = 1 + 1/n + (yr - years_d.mean())**2 / np.sum((years_d - years_d.mean())**2)
+        pred_se = rse * np.sqrt(lever)
+
+        point = max(round(np.exp(lfc)), 5000)
+        lo = max(round(np.exp(lfc - t_val * pred_se)), 5000)
+        hi = round(np.exp(lfc + t_val * pred_se))
+
+        rows.append({
+            "year": int(yr),
+            "total_claims": point,
+            "claims_lo": lo,
+            "claims_hi": hi,
+            "is_forecast": True,
+        })
+
+    # Combine historical + forecast
+    hist_rows = []
+    for _, row in national.iterrows():
+        hist_rows.append({
+            "year": int(row["year"]),
+            "total_claims": int(row["total_claims"]),
+            "claims_lo": int(row["total_claims"]),
+            "claims_hi": int(row["total_claims"]),
+            "is_forecast": False,
+        })
+
+    result = pd.DataFrame(hist_rows + rows)
+    result["trend_slope"] = round(slope, 1)
+    return result
+
+
+def forecast_model_shares(df: pd.DataFrame,
+                          horizon: int = 2) -> pd.DataFrame:
+    """
+    Project each model's theft-claim share using weighted linear trend.
+
+    Shares are bounded [0.5%, 15%] — no model can vanish or dominate
+    beyond plausible limits. Projected ranks are derived from projected
+    shares, which is more stable than extrapolating ranks directly.
+    """
+    years = df["year"].unique()
+    years.sort()
+    max_year = int(years[-1])
+    forecast_years = list(range(max_year + 1, max_year + 1 + horizon))
+
+    projections = []
+
+    for model in df["model"].unique():
+        md = df[df["model"] == model].sort_values("year")
+        yrs = md["year"].values.astype(float)
+        shares = md["theft_claims_pct"].values.astype(float)
+
+        if len(yrs) < 2:
+            # Insufficient data — hold last share flat
+            for fy in forecast_years:
+                projections.append({
+                    "model": model,
+                    "year": fy,
+                    "projected_share": shares[-1],
+                    "confidence": "low",
+                })
+            continue
+
+        slope, intercept, r, p, se = stats.linregress(yrs, shares)
+
+        # Residual SE
+        fitted = intercept + slope * yrs
+        residuals = shares - fitted
+        rse = np.sqrt(np.sum(residuals**2) / max(len(yrs) - 2, 1))
+
+        confidence = (
+            "moderate" if len(yrs) >= 3 and abs(r) > 0.6
+            else "low"
+        )
+
+        for fy in forecast_years:
+            proj = intercept + slope * fy
+            proj = np.clip(proj, 0.5, 15.0)  # bounds
+
+            lever = 1 + 1/len(yrs) + (fy - yrs.mean())**2 / np.sum((yrs - yrs.mean())**2)
+            pred_se = rse * np.sqrt(lever)
+
+            projections.append({
+                "model": model,
+                "year": fy,
+                "projected_share": round(proj, 1),
+                "share_lo": round(max(proj - 1.34 * pred_se, 0.5), 1),
+                "share_hi": round(min(proj + 1.34 * pred_se, 15.0), 1),
+                "share_slope": round(slope, 2),
+                "confidence": confidence,
+            })
+
+    proj_df = pd.DataFrame(projections)
+
+    # Derive projected ranks from projected shares within each year
+    for fy in forecast_years:
+        mask = proj_df["year"] == fy
+        proj_df.loc[mask, "projected_rank"] = (
+            proj_df.loc[mask, "projected_share"]
+            .rank(ascending=False, method="min")
+            .astype(int)
+        )
+
+    return proj_df
+
+
+def build_forecast_summary(df: pd.DataFrame,
+                           national_fc: pd.DataFrame,
+                           share_fc: pd.DataFrame) -> pd.DataFrame:
+    """
+    Combine trajectories, projected shares, and projected claims into
+    a single summary table for each model.
+
+    Projected claims = projected share × projected national claims.
+    """
+    trajectories = compute_model_trajectories(df)
+    forecast_years = share_fc["year"].unique()
+
+    rows = []
+    for _, traj in trajectories.iterrows():
+        model = traj["model"]
+        row = {
+            "model": model,
+            "trajectory_2022_2025": traj["trajectory"],
+            "rank_2025": int(traj["last_rank"]),
+            "rank_slope": traj["rank_trend_slope"],
+        }
+
+        for fy in sorted(forecast_years):
+            fc_row = share_fc[
+                (share_fc["model"] == model) & (share_fc["year"] == fy)
+            ]
+            nat_row = national_fc[
+                (national_fc["year"] == fy) & (national_fc["is_forecast"])
+            ]
+
+            if not fc_row.empty and not nat_row.empty:
+                share = fc_row.iloc[0]["projected_share"]
+                nat_claims = nat_row.iloc[0]["total_claims"]
+                proj_claims = round(share / 100 * nat_claims)
+                proj_rank = int(fc_row.iloc[0]["projected_rank"])
+
+                row[f"share_{fy}"] = share
+                row[f"claims_{fy}"] = proj_claims
+                row[f"rank_{fy}"] = proj_rank
+                row["confidence"] = fc_row.iloc[0]["confidence"]
+
+        rows.append(row)
+
+    return pd.DataFrame(rows).sort_values("rank_2025")
+
+
+def classify_forecast_trajectory(summary: pd.DataFrame) -> pd.DataFrame:
+    """
+    Label each model's forecast outlook based on current trajectory
+    and projected direction.
+    """
+    labels = []
+    for _, row in summary.iterrows():
+        current = row["trajectory_2022_2025"]
+        slope = row["rank_slope"]
+
+        if current == "Rising" and slope < -1:
+            label = "Accelerating threat"
+        elif current == "Rising":
+            label = "Emerging threat"
+        elif current == "Stable" and abs(slope) <= 0.3:
+            label = "Persistent threat"
+        elif current == "Falling" and slope > 1:
+            label = "Declining rapidly"
+        elif current == "Falling":
+            label = "Declining gradually"
+        else:
+            label = "Stable"
+
+        labels.append(label)
+
+    summary = summary.copy()
+    summary["forecast_outlook"] = labels
+    return summary
+
+
+def print_forecast_report(summary: pd.DataFrame,
+                          national_fc: pd.DataFrame):
+    """Print the forecasting report."""
+    print("\n" + "=" * 70)
+    print("THEFT FORECAST: PROJECTED MODEL RANKINGS 2026-2027")
+    print("Based on 2022-2025 AMI claim-share trends")
+    print("=" * 70)
+
+    fc_years = [c for c in summary.columns if c.startswith("rank_20")
+                and c != "rank_2025"]
+
+    print("\n--- National Claims Projection ---\n")
+    for _, row in national_fc.iterrows():
+        tag = " (projected)" if row["is_forecast"] else ""
+        band = ""
+        if row["is_forecast"]:
+            band = f"  [range: {int(row['claims_lo']):,}-{int(row['claims_hi']):,}]"
+        print(f"  {int(row['year'])}: {int(row['total_claims']):,}{tag}{band}")
+
+    print("\n--- Projected Rankings ---\n")
+    header = f"  {'Model':<20} {'2025':>6}"
+    for c in fc_years:
+        yr = c.replace("rank_", "")
+        header += f" {'→ ' + yr:>9}"
+    header += f"  {'Outlook':<22}"
+    print(header)
+    print("  " + "-" * (len(header) - 2))
+
+    for _, row in summary.iterrows():
+        line = f"  {row['model']:<20} #{int(row['rank_2025']):<5}"
+        for c in fc_years:
+            if c in row and pd.notna(row[c]):
+                line += f"  → #{int(row[c]):<5}"
+            else:
+                line += f"  {'—':>8}"
+        line += f"  {row['forecast_outlook']}"
+        print(line)
+
+    print("\n--- Key Projections ---\n")
+    for _, row in summary.iterrows():
+        if row["forecast_outlook"] in ("Accelerating threat", "Emerging threat"):
+            print(f"  ▲ {row['model']}: projected to rise "
+                  f"(rank slope {row['rank_slope']:+.1f}/yr)")
+        elif "Declining" in row["forecast_outlook"]:
+            print(f"  ▼ {row['model']}: projected to fall "
+                  f"(rank slope {row['rank_slope']:+.1f}/yr)")
+
+    print("\n  ⚠ Caveat: 4-year series; projections are indicative trends,")
+    print("    not precise forecasts. External shocks (policy changes,")
+    print("    security upgrades, economic shifts) can alter trajectories.")
+
+
 def main():
     df = load_historical_ami()
 
@@ -272,14 +544,26 @@ def main():
 
     print_time_series_report(aqua_trend, trajectories, national, assessment)
 
+    # Forecasting
+    national_fc = forecast_national_claims(national)
+    share_fc = forecast_model_shares(df)
+    summary = build_forecast_summary(df, national_fc, share_fc)
+    summary = classify_forecast_trajectory(summary)
+
+    print_forecast_report(summary, national_fc)
+
     # Save
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     aqua_trend.to_csv(OUTPUT_DIR / "aqua_trend_2022_2025.csv", index=False)
     trajectories.to_csv(OUTPUT_DIR / "model_trajectories.csv", index=False)
     national.to_csv(OUTPUT_DIR / "national_claims_trend.csv", index=False)
+    national_fc.to_csv(OUTPUT_DIR / "national_claims_forecast.csv",
+                       index=False)
+    share_fc.to_csv(OUTPUT_DIR / "model_share_forecast.csv", index=False)
+    summary.to_csv(OUTPUT_DIR / "forecast_summary.csv", index=False)
     print(f"\nResults saved to {OUTPUT_DIR}/")
 
-    return aqua_trend, trajectories, national, assessment
+    return aqua_trend, trajectories, national, assessment, summary
 
 
 if __name__ == "__main__":

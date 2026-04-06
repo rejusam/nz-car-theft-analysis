@@ -521,6 +521,204 @@ def plot_model_rank_trajectories(df_hist: pd.DataFrame):
     print("Saved: 10_rank_trajectories.png")
 
 
+def plot_forecast_rank_trajectories(df_hist: pd.DataFrame,
+                                    share_fc: pd.DataFrame):
+    """
+    Bump chart showing historical rank trajectories (2022-2025) extended
+    with dashed projected lines (2026-2027).
+
+    Highlights the projected Corolla-Aqua crossover and the Hilux rise.
+    """
+    fig, ax = plt.subplots(figsize=(14, 9))
+
+    highlight_models = {"Toyota Aqua", "Toyota Corolla", "Mazda Demio",
+                        "Nissan Tiida", "Toyota Hilux"}
+
+    model_colors = {
+        "Toyota Aqua": COLORS["aqua_highlight"],
+        "Toyota Corolla": "#2A9D8F",
+        "Toyota Hilux": "#E9C46A",
+        "Mazda Demio": "#264653",
+        "Nissan Tiida": "#457B9D",
+    }
+
+    for model in df_hist["model"].unique():
+        model_data = df_hist[df_hist["model"] == model].sort_values("year")
+        if len(model_data) < 2:
+            continue
+
+        is_highlight = model in highlight_models
+        color = model_colors.get(model, COLORS["grid"])
+        alpha = 1.0 if is_highlight else 0.25
+        lw = 3 if model == "Toyota Aqua" else 2.5 if is_highlight else 1
+        zorder = 5 if model == "Toyota Aqua" else 3 if is_highlight else 1
+
+        # Historical line (solid)
+        ax.plot(model_data["year"], model_data["rank"],
+                "o-", color=color, alpha=alpha, linewidth=lw,
+                markersize=7, zorder=zorder)
+
+        # Forecast extension (dashed)
+        if is_highlight:
+            last_year = int(model_data.iloc[-1]["year"])
+            last_rank = int(model_data.iloc[-1]["rank"])
+
+            fc_model = share_fc[share_fc["model"] == model].sort_values("year")
+            if not fc_model.empty:
+                fc_years = [last_year] + fc_model["year"].tolist()
+                fc_ranks = [last_rank] + fc_model["projected_rank"].tolist()
+
+                ax.plot(fc_years, fc_ranks, "o--", color=color,
+                        alpha=alpha * 0.7, linewidth=lw, markersize=7,
+                        zorder=zorder)
+
+            # Label at the end
+            final_row = fc_model.iloc[-1] if not fc_model.empty else model_data.iloc[-1]
+            final_year = final_row["year"]
+            final_rank = (final_row["projected_rank"]
+                          if "projected_rank" in final_row
+                          else final_row["rank"])
+            short = (model.replace("Toyota ", "")
+                          .replace("Nissan ", "")
+                          .replace("Mazda ", ""))
+            ax.text(final_year + 0.15, final_rank, short,
+                    va="center", fontsize=9, color=color,
+                    fontweight="bold" if model == "Toyota Aqua" else "normal")
+
+    # Forecast region shading
+    ax.axvspan(2025.5, 2027.5, alpha=0.06, color=COLORS["bar_default"],
+               zorder=0)
+    ax.text(2026.5, 0.3, "Projected", ha="center", fontsize=10,
+            color=COLORS["bar_default"], fontstyle="italic",
+            transform=ax.get_xaxis_transform())
+
+    ax.invert_yaxis()
+    ax.set_xlabel("Year")
+    ax.set_ylabel("Theft Rank (1 = most stolen)")
+    ax.set_title("Theft Ranking Trajectories: History + Forecast\n"
+                 "Corolla projected to overtake Aqua by 2026")
+    ax.set_xticks([2022, 2023, 2024, 2025, 2026, 2027])
+    ax.set_yticks(range(1, 13))
+    ax.yaxis.grid(True, alpha=0.2)
+    ax.set_xlim(2021.7, 2027.8)
+
+    plt.tight_layout()
+    plt.savefig(OUTPUT_DIR / "14_forecast_rank_trajectories.png", dpi=150,
+                bbox_inches="tight")
+    plt.close()
+    print("Saved: 14_forecast_rank_trajectories.png")
+
+
+def plot_claims_forecast(aqua_trend: pd.DataFrame,
+                         national_fc: pd.DataFrame,
+                         share_fc: pd.DataFrame):
+    """
+    National and Aqua claims with forecast bands.
+
+    Historical data as solid bars/lines; forecast as hatched bars with
+    shaded prediction intervals.
+    """
+    fig, ax1 = plt.subplots(figsize=(12, 7))
+
+    hist = national_fc[~national_fc["is_forecast"]]
+    fc = national_fc[national_fc["is_forecast"]]
+
+    # Historical national bars
+    ax1.bar(hist["year"], hist["total_claims"], color=COLORS["bar_secondary"],
+            alpha=0.6, width=0.6, label="National claims (actual)")
+
+    # Forecast national bars with intervals
+    ax1.bar(fc["year"], fc["total_claims"], color=COLORS["bar_secondary"],
+            alpha=0.3, width=0.6, hatch="//",
+            label="National claims (projected)")
+    ax1.errorbar(fc["year"], fc["total_claims"],
+                 yerr=[fc["total_claims"] - fc["claims_lo"],
+                       fc["claims_hi"] - fc["total_claims"]],
+                 fmt="none", color=COLORS["bar_default"], capsize=5,
+                 linewidth=2, zorder=4)
+
+    # Value labels
+    for _, row in national_fc.iterrows():
+        tag = "*" if row["is_forecast"] else ""
+        ax1.text(row["year"], row["total_claims"] + 250,
+                 f"{int(row['total_claims']):,}{tag}", ha="center",
+                 fontsize=9, color=COLORS["text"])
+
+    ax1.set_xlabel("Year")
+    ax1.set_ylabel("Total National Claims", color=COLORS["bar_default"])
+    ax1.tick_params(axis="y", labelcolor=COLORS["bar_default"])
+    ax1.set_ylim(0, 20000)
+
+    # Aqua claims (secondary axis)
+    ax2 = ax1.twinx()
+
+    aqua_years = aqua_trend["year"].values
+    aqua_claims = aqua_trend["est_model_claims"].values
+
+    ax2.plot(aqua_years, aqua_claims, "o-", color=COLORS["aqua_highlight"],
+             linewidth=2.5, markersize=8, label="Aqua claims (actual)",
+             zorder=5)
+
+    # Aqua forecast
+    aqua_fc = share_fc[share_fc["model"] == "Toyota Aqua"].sort_values("year")
+    if not aqua_fc.empty:
+        fc_aqua_claims = []
+        fc_lo = []
+        fc_hi = []
+        for _, row in aqua_fc.iterrows():
+            nat = national_fc[national_fc["year"] == row["year"]]
+            if not nat.empty:
+                nat_claims = nat.iloc[0]["total_claims"]
+                fc_aqua_claims.append(row["projected_share"] / 100 * nat_claims)
+                fc_lo.append(row["share_lo"] / 100 * nat.iloc[0]["claims_lo"])
+                fc_hi.append(row["share_hi"] / 100 * nat.iloc[0]["claims_hi"])
+
+        fc_years = aqua_fc["year"].values
+        bridge_years = np.concatenate([[aqua_years[-1]], fc_years])
+        bridge_claims = np.concatenate([[aqua_claims[-1]], fc_aqua_claims])
+
+        ax2.plot(bridge_years, bridge_claims, "o--",
+                 color=COLORS["aqua_highlight"], linewidth=2.5, markersize=8,
+                 alpha=0.6, label="Aqua claims (projected)", zorder=5)
+
+        ax2.fill_between(fc_years, fc_lo, fc_hi,
+                         alpha=0.12, color=COLORS["aqua_highlight"])
+
+    ax2.set_ylabel("Toyota Aqua Claims", color=COLORS["aqua_highlight"])
+    ax2.tick_params(axis="y", labelcolor=COLORS["aqua_highlight"])
+    ax2.set_ylim(0, 1800)
+
+    # Aqua value labels
+    for yr, val in zip(aqua_years, aqua_claims):
+        ax2.text(yr + 0.12, val + 20, f"{int(val):,}", ha="left",
+                 fontsize=9, color=COLORS["aqua_highlight"],
+                 fontweight="bold")
+    for yr, val in zip(fc_years, fc_aqua_claims):
+        ax2.text(yr + 0.12, val + 20, f"{int(val):,}*", ha="left",
+                 fontsize=9, color=COLORS["aqua_highlight"], alpha=0.7)
+
+    ax1.set_xticks([2022, 2023, 2024, 2025, 2026, 2027])
+
+    # Forecast region
+    ax1.axvspan(2025.5, 2027.5, alpha=0.05, color=COLORS["bar_default"],
+                zorder=0)
+
+    # Combined legend
+    lines1, labels1 = ax1.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+    ax1.legend(lines1 + lines2, labels1 + labels2, loc="upper right",
+               fontsize=9)
+
+    ax1.set_title("Vehicle Theft Claims: Actual (2022-2025) + Forecast (2026-2027)\n"
+                  "* Projected from post-peak trend; 4-year series caveat applies")
+
+    plt.tight_layout()
+    plt.savefig(OUTPUT_DIR / "15_claims_forecast.png", dpi=150,
+                bbox_inches="tight")
+    plt.close()
+    print("Saved: 15_claims_forecast.png")
+
+
 def plot_police_vehicle_age_distribution(police_df: pd.DataFrame):
     """
     Histogram of stolen vehicle ages from police row-level data.
@@ -642,6 +840,129 @@ def plot_police_regional_percapita(regional: pd.DataFrame):
     print("Saved: 13_police_regional_percapita.png")
 
 
+def plot_socioeconomic_drivers(df: pd.DataFrame, correlations: pd.DataFrame):
+    """
+    Panel of scatter plots showing the strongest socioeconomic
+    predictors of regional theft rate.
+
+    Four panels: deprivation, unemployment, urbanisation, and density.
+    Each region is a point, labelled where space permits.
+    """
+    fig, axes = plt.subplots(2, 2, figsize=(14, 11))
+
+    panels = [
+        ("deprivation_index", "NZ Deprivation Index\n(1=least, 10=most deprived)"),
+        ("unemployment_rate", "Unemployment Rate (%)"),
+        ("pct_urban", "Urban Population (%)"),
+        ("density_km2", "Population Density (per km²)"),
+    ]
+
+    label_regions = {"Gisborne", "Auckland", "Nelson", "Canterbury",
+                     "Wellington", "Northland", "Southland",
+                     "Bay of Plenty"}
+
+    for ax, (var, xlabel) in zip(axes.flat, panels):
+        x = df[var].values
+        y = df["thefts_per_10k"].values
+
+        # Correlation from precomputed table (Spearman)
+        corr_row = correlations[correlations["variable"] == var]
+        rho = corr_row.iloc[0]["spearman_rho"] if not corr_row.empty else 0
+        rho_p = corr_row.iloc[0]["spearman_p"] if not corr_row.empty else 1
+
+        ax.scatter(x, y, c=COLORS["bar_default"], s=80, zorder=5,
+                   edgecolors="white", linewidth=1)
+
+        # Trend line (visual aid only)
+        slope, intercept, _, _, _ = stats.linregress(x, y)
+        x_line = np.linspace(x.min(), x.max(), 100)
+        ax.plot(x_line, intercept + slope * x_line, "--",
+                color=COLORS["aqua_highlight"], linewidth=1.5, alpha=0.7)
+
+        # Labels
+        for _, row in df.iterrows():
+            if row["region"] in label_regions:
+                offset = (5, 5)
+                if row["region"] == "Auckland":
+                    offset = (5, -12)
+                elif row["region"] == "Nelson":
+                    offset = (5, -12)
+                ax.annotate(
+                    row["region"], (row[var], row["thefts_per_10k"]),
+                    textcoords="offset points", xytext=offset,
+                    fontsize=8, color=COLORS["text"], alpha=0.8,
+                )
+
+        sig = " *" if rho_p < 0.05 else ""
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel("Thefts per 10,000 pop.")
+        ax.set_title(f"ρ = {rho:+.3f} (p={rho_p:.2f}){sig}", fontsize=11)
+        ax.yaxis.grid(True, alpha=0.2)
+
+    fig.suptitle("Socioeconomic Predictors of Regional Theft Rate\n"
+                 "Each point is a NZ region (n=13); "
+                 "dashed line = linear fit",
+                 fontsize=13, fontweight="bold", y=1.01)
+
+    plt.tight_layout()
+    plt.savefig(OUTPUT_DIR / "16_socioeconomic_drivers.png", dpi=150,
+                bbox_inches="tight")
+    plt.close()
+    print("Saved: 16_socioeconomic_drivers.png")
+
+
+def plot_residual_map(residuals: pd.DataFrame, model_info: dict):
+    """
+    Horizontal bar chart of model residuals: which regions have
+    more/fewer thefts than socioeconomic factors predict?
+
+    Positive residuals = unexplained excess theft (other factors at
+    play). Negative = less theft than expected (protective factors).
+    """
+    fig, ax = plt.subplots(figsize=(10, 7))
+
+    res = residuals.sort_values("std_residual")
+
+    colors = [
+        COLORS["aqua_highlight"] if r > 0.8
+        else "#264653" if r < -0.8
+        else COLORS["bar_secondary"]
+        for r in res["std_residual"]
+    ]
+
+    ax.barh(res["region"], res["std_residual"], color=colors,
+            edgecolor="white", linewidth=0.5)
+
+    # Reference lines
+    ax.axvline(0, color=COLORS["text"], linewidth=1)
+    ax.axvline(1.0, color=COLORS["grid"], linewidth=1, linestyle="--",
+               alpha=0.5)
+    ax.axvline(-1.0, color=COLORS["grid"], linewidth=1, linestyle="--",
+               alpha=0.5)
+
+    # Value labels
+    for i, (_, row) in enumerate(res.iterrows()):
+        ha = "left" if row["std_residual"] >= 0 else "right"
+        offset = 0.08 if row["std_residual"] >= 0 else -0.08
+        ax.text(row["std_residual"] + offset, i,
+                f'{row["std_residual"]:+.2f}',
+                va="center", ha=ha, fontsize=9, color=COLORS["text"])
+
+    preds = ", ".join(p.replace("_", " ") for p in model_info["predictors"])
+    ax.set_xlabel("Standardised Residual\n"
+                  "(positive = more theft than predicted)")
+    ax.set_title(f"Theft Rates Unexplained by Socioeconomic Factors\n"
+                 f"Model: {preds} (R² = {model_info['r_squared']:.2f})",
+                 fontsize=12)
+    ax.xaxis.grid(True, alpha=0.2)
+
+    plt.tight_layout()
+    plt.savefig(OUTPUT_DIR / "17_socioeconomic_residuals.png", dpi=150,
+                bbox_inches="tight")
+    plt.close()
+    print("Saved: 17_socioeconomic_residuals.png")
+
+
 def generate_all_figures():
     """Generate all analysis figures."""
     setup_style()
@@ -678,6 +999,7 @@ def generate_all_figures():
     # Time series
     from time_series_analysis import (
         load_historical_ami, compute_aqua_trend, compute_national_trend,
+        forecast_national_claims, forecast_model_shares,
     )
     hist = load_historical_ami()
     aqua_trend = compute_aqua_trend(hist)
@@ -686,6 +1008,12 @@ def generate_all_figures():
     plot_claims_time_series(aqua_trend, national)
     plot_aqua_share_trend(aqua_trend)
     plot_model_rank_trajectories(hist)
+
+    # Forecasting
+    national_fc = forecast_national_claims(national)
+    share_fc = forecast_model_shares(hist)
+    plot_forecast_rank_trajectories(hist, share_fc)
+    plot_claims_forecast(aqua_trend, national_fc, share_fc)
 
     # Police data plots
     from police_data_analysis import (
@@ -702,6 +1030,17 @@ def generate_all_figures():
     from cross_source_validation import build_comparison_table
     comparison = build_comparison_table()
     plot_cross_source_ranking(comparison)
+
+    # Socioeconomic analysis
+    from socioeconomic_analysis import (
+        build_analysis_dataset, compute_bivariate_correlations,
+        fit_multivariable_model,
+    )
+    socio_df = build_analysis_dataset()
+    socio_corr = compute_bivariate_correlations(socio_df)
+    socio_model = fit_multivariable_model(socio_df)
+    plot_socioeconomic_drivers(socio_df, socio_corr)
+    plot_residual_map(socio_model["residuals"], socio_model)
 
     print(f"\nAll figures saved to {OUTPUT_DIR}/")
 

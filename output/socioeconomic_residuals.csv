@@ -1,0 +1,14 @@
+region,thefts_per_10k,predicted,residual,std_residual
+Auckland,9.62,14.8,-5.1,-0.89
+Bay of Plenty,12.8,14.6,-1.8,-0.32
+Canterbury,10.08,6.3,3.8,0.66
+Gisborne,33.59,24.4,9.2,1.59
+Hawke's Bay,5.47,13.3,-7.9,-1.36
+Manawatū-Whanganui,5.38,12.9,-7.5,-1.31
+Nelson,16.88,9.7,7.2,1.25
+Northland,11.61,12.7,-1.1,-0.19
+Otago,5.65,4.6,1.0,0.17
+Southland,2.54,3.0,-0.5,-0.08
+Taranaki,8.8,3.8,5.0,0.86
+Waikato,7.18,9.6,-2.4,-0.42
+Wellington,7.67,7.4,0.2,0.04

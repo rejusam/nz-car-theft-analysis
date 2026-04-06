@@ -156,6 +156,29 @@ Rankings and figures sourced from AA Insurance's published annual stolen vehicle
 - Annual granularity (no monthly or weekly data)
 - Most recent available year is 2023; 2024 data not yet published at time of collection
 
+## 10. Regional Socioeconomic Indicators
+
+**Source**: Stats NZ Census 2018, Household Labour Force Survey (HLFS) 2023,
+NZ Deprivation Index (NZDep2018)
+**Coverage**: 13 NZ regions matching police stolen vehicle data
+**File**: `regional_socioeconomic.csv`
+
+**Indicators compiled**:
+- Median personal income (Stats NZ Census 2018)
+- Unemployment rate (HLFS 2023 regional estimates)
+- Percentage of population under 25 (Census 2018)
+- Percentage of rental housing tenure (Census 2018)
+- Percentage urban population (Stats NZ urban/rural classification)
+- NZ Deprivation Index (NZDep2018, regional average on 1-10 scale)
+- Vehicles per capita (derived from NZTA MVR / Stats NZ population)
+
+**Limitations**:
+- Census 2018 data is 8 years old; intercensal estimates are used where available
+- NZDep is computed at meshblock level; regional averages smooth over
+  within-region variation (e.g., Auckland contains both NZDep 1 and 10 areas)
+- Ecological analysis: correlations describe area-level patterns, not
+  individual-level risk factors
+
 ## Notes on Data Assembly
 
 Fleet registration counts in `nz_fleet_by_model.csv` are compiled from:

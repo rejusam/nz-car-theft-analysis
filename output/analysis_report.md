@@ -121,7 +121,53 @@ Claims peaked in 2023 during NZ's ram-raid crisis, then declined substantially a
 
 **Falling in rankings**: Mazda Demio, Mazda Atenza, Toyota Mark X, Subaru Legacy
 
-## 7. NZ Police Stolen Vehicle Records
+## 7. Forecast: Projected Rankings 2026-2027
+
+Using the 2022-2025 claim-share trends, we can project which models are likely to rise or fall in future rankings. These projections use linear extrapolation of each model's share trajectory and a log-linear model for national claims (fitted to the post-peak decline). With only four years of data, these are indicative trends rather than precise forecasts.
+
+### National Claims Outlook
+
+- **2026**: ~6,483 claims (range: 5,933-7,083)
+- **2027**: ~5,000 claims (range: 5,000-5,303)
+
+The post-peak decline is projected to continue, with national claims converging toward pre-spike levels as ram-raid enforcement holds and the fleet gradually turns over.
+
+### Projected Model Rankings
+
+| Model | 2025 Rank | 2026 | 2027 | Outlook |
+|-------|-----------|------|------|---------|
+| Toyota Aqua | #1 | #2 | #2 | Persistent threat |
+| Toyota Corolla | #2 | #1 | #1 | Accelerating threat |
+| Nissan Tiida | #3 | #3 | #3 | Persistent threat |
+| Mazda Demio | #4 | #6 | #9 | Declining gradually |
+| Toyota Vitz | #5 | #5 | #5 | Persistent threat |
+| Toyota Hilux | #6 | #4 | #4 | Accelerating threat |
+| Subaru Impreza | #7 | #6 | #6 | Emerging threat |
+| Mazda Atenza | #8 | #8 | #8 | Declining rapidly |
+| Toyota Mark X | #9 | #11 | #11 | Declining rapidly |
+| Subaru Legacy | #9 | #12 | #12 | Declining rapidly |
+| Mazda Axela | #10 | #10 | #9 | Persistent threat |
+
+### Key Projections
+
+**Toyota Corolla projected to overtake the Aqua as most-stolen by 2026.** The Corolla's claim share has climbed steadily (+1.5 percentage points/year), driven by its massive and ageing fleet. Meanwhile, the Aqua's share is declining as newer models with encrypted immobilisers enter the fleet.
+
+- **Toyota Corolla** (Accelerating threat): rank slope -1.9/yr
+- **Toyota Hilux** (Accelerating threat): rank slope -2.0/yr
+- **Subaru Impreza** (Emerging threat): rank slope -0.6/yr
+
+- **Mazda Demio** (Declining gradually): ageing out of the at-risk fleet
+- **Mazda Atenza** (Declining rapidly): ageing out of the at-risk fleet
+- **Toyota Mark X** (Declining rapidly): ageing out of the at-risk fleet
+- **Subaru Legacy** (Declining rapidly): ageing out of the at-risk fleet
+
+*Caveat: Four-year series. External shocks — immobiliser mandates, scrappage schemes, economic shifts — could alter these trajectories substantially.*
+
+![Forecast Trajectories](figures/14_forecast_rank_trajectories.png)
+
+![Claims Forecast](figures/15_claims_forecast.png)
+
+## 8. NZ Police Stolen Vehicle Records
 
 The NZ Police Vehicle of Interest database provides row-level records of 4,500+ stolen vehicles (Oct 2021 – Apr 2022). Unlike insurance data, this captures all reported thefts regardless of insurance status.
 
@@ -146,7 +192,7 @@ The NZ Police Vehicle of Interest database provides row-level records of 4,500+ 
 
 ![Police Regional](figures/13_police_regional_percapita.png)
 
-## 8. Cross-Source Validation
+## 9. Cross-Source Validation
 
 Do four independent data sources — AMI Insurance, AA Insurance, NZ Police records, and MoneyHub compiled statistics — tell the same story? Agreement across sources strengthens conclusions; divergence reveals source-specific biases.
 
@@ -180,7 +226,60 @@ Do four independent data sources — AMI Insurance, AA Insurance, NZ Police reco
 
 - AGREEMENT: AMI and AA Insurance rankings are strongly correlated (Spearman ρ = 0.786, n = 8), despite covering different policyholder pools.
 
-## 9. Conclusion
+## 10. Socioeconomic Risk Factors: Beyond Vehicle Make
+
+Vehicle theft is not solely a function of car model and security features. Area-level socioeconomic conditions shape theft rates independently of what people drive. Using NZ Police stolen vehicle records matched with Stats NZ regional indicators, we test which demographic factors predict where theft is concentrated.
+
+*Methodology note: This is an ecological (area-level) analysis across 13 NZ regions. Correlations describe how theft rates vary with regional characteristics — they do not imply individual-level causation.*
+
+### Bivariate Correlations with Theft Rate
+
+| Indicator | Spearman ρ | p-value | Direction |
+|-----------|-----------|---------|-----------|
+| Density Km2 | +0.407 | 0.168 | moderate positive |
+| Unemployment Rate | +0.390 | 0.188 | weak positive |
+| Vehicles Per Capita | -0.341 | 0.255 | weak negative |
+| Median Income | -0.203 | 0.505 | weak negative |
+| Pct Rental | +0.203 | 0.505 | weak positive |
+| Pct Urban | +0.176 | 0.566 | weak positive |
+| Pct Under 25 | +0.088 | 0.775 | weak positive |
+| Deprivation Index | +0.088 | 0.775 | weak positive |
+
+No individual indicator reaches significance at p<0.05 with n=13 regions, but the directions are consistent: higher deprivation, unemployment, and population density are all associated with higher theft rates.
+
+### Combined Model
+
+The best 2-predictor model uses **deprivation index + pct urban** and explains 55% of the regional variance in theft rates (adjusted R² = 0.47, F-test p = 0.018). This is significant at the 5% level despite neither predictor reaching significance alone — they act as complementary predictors, with urbanisation suppressing noise in the deprivation signal.
+
+### Regional Outliers
+
+**More theft than socioeconomic factors predict:**
+
+- **Gisborne**: actual 33.6 vs predicted 24.4 per 10,000
+- **Nelson**: actual 16.9 vs predicted 9.7 per 10,000
+
+**Less theft than socioeconomic factors predict:**
+
+- **Hawke's Bay**: actual 5.5 vs predicted 13.3 per 10,000
+- **Manawatū-Whanganui**: actual 5.4 vs predicted 12.9 per 10,000
+
+Gisborne's large positive residual suggests factors beyond deprivation and urbanisation — possibly its small population (where a handful of prolific offenders can shift per-capita rates substantially), geographic isolation, or local enforcement patterns.
+
+![Socioeconomic Drivers](figures/16_socioeconomic_drivers.png)
+
+![Residual Analysis](figures/17_socioeconomic_residuals.png)
+
+### Implications for Insurance and Policy
+
+Vehicle theft risk is a function of at least three layers:
+
+1. **Vehicle factors** — model, age, security features, parts demand (analysed in sections 1-4)
+2. **Geographic factors** — regional theft culture, enforcement intensity, urban density (section 5)
+3. **Socioeconomic factors** — deprivation, unemployment, housing tenure (this section)
+
+Insurance pricing that considers only vehicle model misses the second and third layers. An Aqua in low-deprivation Southland (2.5 thefts per 10,000) faces a fundamentally different risk profile from one in high-deprivation Gisborne (33.6 per 10,000). Postcode-level risk adjustment — already standard in many markets — would better reflect this reality.
+
+## 11. Conclusion
 
 The claim that the Toyota Aqua is NZ's most theft-prone car is **partially true but requires context**:
 
@@ -192,7 +291,11 @@ The claim that the Toyota Aqua is NZ's most theft-prone car is **partially true 
 
 4. **Trending down**: Absolute Aqua theft claims have declined 47% from the 2023 peak, tracking the overall national decline. The Aqua's share of claims has shifted from 11.0% to 8.0%.
 
-5. **Structural**: The Aqua's vulnerability is largely explained by its age profile, lack of encrypted immobilisers in early models, high Auckland concentration, and robust parts demand. These are fixable factors, not inherent model defects.
+5. **Forecast**: If current trends hold, the Toyota Corolla is projected to overtake the Aqua as the most-stolen model by 2026, driven by its larger, ageing fleet. The Hilux is also rising, while older Mazda models are declining.
+
+6. **Socioeconomic context**: Regional deprivation and urbanisation together explain 55% of the variance in per-capita theft rates. Vehicle model alone is an incomplete risk picture — where the car is parked matters as much as what it is.
+
+7. **Structural**: The Aqua's vulnerability is largely explained by its age profile, lack of encrypted immobilisers in early models, high Auckland concentration, and robust parts demand. These are fixable factors, not inherent model defects.
 
 ## Data Sources
 
@@ -200,3 +303,5 @@ The claim that the Toyota Aqua is NZ's most theft-prone car is **partially true 
 - MoneyHub, NZ Police theft data, Jun-Dec 2025
 - NZTA Waka Kotahi, Motor Vehicle Register
 - CarJam fleet registration data
+- Stats NZ Census 2018 / Household Labour Force Survey 2023
+- NZ Deprivation Index (NZDep2018)

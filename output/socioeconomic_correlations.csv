@@ -1,0 +1,9 @@
+variable,pearson_r,pearson_p,spearman_rho,spearman_p,direction,strength
+density_km2,0.025,0.9353,0.407,0.168,positive,moderate
+unemployment_rate,0.612,0.0263,0.39,0.1876,positive,weak
+vehicles_per_capita,-0.4,0.1755,-0.341,0.2546,negative,weak
+median_income,-0.544,0.0547,-0.203,0.5053,negative,weak
+pct_rental,0.09,0.7708,0.203,0.5053,positive,weak
+pct_urban,-0.049,0.8727,0.176,0.5656,positive,weak
+pct_under_25,0.297,0.3246,0.088,0.7752,positive,weak
+deprivation_index,0.574,0.0404,0.088,0.7752,positive,weak
